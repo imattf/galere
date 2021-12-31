@@ -14,6 +14,16 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-
 # Mac hidden files
 .DS_Store
+
+# my binary files
+lenslocked.com
+images/**
+
+# Anything under a temp or stuff folder
+**/temp/*
+**/stuff/*
+
+# sensitive files that should not be in repo
+.config
