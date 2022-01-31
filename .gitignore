@@ -18,12 +18,12 @@
 .DS_Store
 
 # my binary files
-lenslocked.com
+galere
 images/**
+*.pdf
 
-# Anything under a temp or stuff folder
-**/temp/*
-**/stuff/*
+# Anything under a tmp folder
+**/tmp/*
 
 # sensitive files that should not be in repo
 .config
