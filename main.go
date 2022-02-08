@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -28,53 +29,38 @@ func faqHandler(w http.ResponseWriter, r *http.Request) {
 
 func notfoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Sorry... kind find that page!</h1>")
+	fmt.Fprint(w, "<h1>Sorry... can't find that page!</h1>")
 	fmt.Fprintln(w, "Page not found for ", r.URL.Path)
 }
 
-// func pathHandler(w http.ResponseWriter, r *http.Request) {
-// 	switch r.URL.Path {
-// 	case "/":
-// 		homeHandler(w, r)
-// 	case "/contact":
-// 		contactHandler(w, r)
-// 	default:
-// 		// TODO: first one
-// 		// http.Error(w, "Page not found", http.StatusNotFound)
-// 		w.WriteHeader(http.StatusNotFound)
-// 		fmt.Fprintln(w, "Page not found for ", r.URL.Path)
-// 		fmt.Fprintln(w, "Page not found for ", r.URL.RawPath)
-// 	}
-
-// }
-
-// type Router struct{}
-
-// func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-// 	switch r.URL.Path {
-// 	case "/":
-// 		homeHandler(w, r)
-// 	case "/contact":
-// 		contactHandler(w, r)
-// 	case "/faq":
-// 		faqHandler(w, r)
-// 	default:
-// 		http.Error(w, "Page not found", http.StatusNotFound)
-// 	}
-
-// }
+// Capture the chi URL Parameter
+func userHandler(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userID")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, "<h1>Welcome to the Galare</h1>")
+	w.Write([]byte(fmt.Sprintf("hi %v", userID)))
+}
 
 func main() {
-	// var router Router
-	// http.HandleFunc("/", pathHandler)
-	// http.HandleFunc("/", homeHandler)
-	// http.HandleFunc("/contact", contactHandler)
 
+	// a new chi router
 	r := chi.NewRouter()
+
+	// enable chi logging across app
+	// r.Use(middleware.Logger)
+
+	// enable chi logging on single route
+	// ... but doesn't work :(
+	r.Route("/faqs", func(r chi.Router) {
+		r.Use(middleware.Logger)
+		r.Get("/faq", faqHandler)
+	})
+
 	r.Get("/", homeHandler)
 	r.Get("/contact", contactHandler)
 	r.Get("/faq", faqHandler)
 	r.NotFound(notfoundHandler)
+	r.Get("/user/{userID}", userHandler)
 	fmt.Println("Starting the galare server on :3000")
 	http.ListenAndServe(":3000", r)
 }
