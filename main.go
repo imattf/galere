@@ -10,17 +10,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+// helper function...
+// execute template
+func executeTemplate(w http.ResponseWriter, filepath string) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	// Windows OS proof approach...
 	// parse the gohtml file
-	// tplPath := filepath.Join("templates", "home.gohtml")
-	// tpl, err := template.ParseFiles(tplPath)
-
-	// unix/linux approach...
-	// parse the gohtml file
-	tpl, err := template.ParseFiles("templates/home.gohtml")
+	tpl, err := template.ParseFiles(filepath)
 
 	if err != nil {
 		log.Printf("parsing error on %v", err)
@@ -35,12 +31,16 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "There was an error rendering the template.", http.StatusInternalServerError)
 		return
 	}
+}
 
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	// parse & render the gohtml file w/ the new helper function
+	executeTemplate(w, "templates/home.gohtml")
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:matthew@faulkners.io\">matthew@faulkners.io</a>.</p>")
+	// parse & render the gohtml file w/ the new helper function
+	executeTemplate(w, "templates/contact.gohtml")
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
