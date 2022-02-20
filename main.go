@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
@@ -9,10 +11,31 @@ import (
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// bio := `i've been hackin around 25 years`
-	bio := `<script>alert("Haha, you have been h4x0r3d!");</script>`
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Welcome to the Galare!</h1><p>User's bio: "+bio+"</p>")
+
+	// Windows OS proof approach...
+	// parse the gohtml file
+	// tplPath := filepath.Join("templates", "home.gohtml")
+	// tpl, err := template.ParseFiles(tplPath)
+
+	// unix/linux approach...
+	// parse the gohtml file
+	tpl, err := template.ParseFiles("templates/home.gohtml")
+
+	if err != nil {
+		log.Printf("parsing error on %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
+	}
+
+	// render the gohtml file
+	err = tpl.Execute(w, nil)
+	if err != nil {
+		log.Printf("rendering error on %v", err)
+		http.Error(w, "There was an error rendering the template.", http.StatusInternalServerError)
+		return
+	}
+
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
