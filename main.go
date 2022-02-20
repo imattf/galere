@@ -44,12 +44,8 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, `<h1>FAQ Page</h1>
-	<ul><b>Is this thing free?</b> Yes, this is free.</ul>
-	<ul><b>Would you like a wake-up call?</b> Yes, I need to quit my job & go back to college.</ul>
-	<ul><b>Who can help me here?</b> Please email me at <a href="mailto:matthew@faulkners.io">matthew@faulkners.io.</a></ul>
-	`)
+	// parse & render the gohtml file w/ the new helper function
+	executeTemplate(w, "templates/faq.gohtml")
 }
 
 func notfoundHandler(w http.ResponseWriter, r *http.Request) {
