@@ -9,6 +9,8 @@ import (
 // Regular code approach
 type User struct {
 	Name string
+	Bio  string
+	// Bio  template.HTML     //to keep as HTML and not have template change to string
 	Age  int
 	Meta UserMeta
 }
@@ -42,6 +44,7 @@ func main() {
 
 	user := User{
 		Name: "Bilbo Baggins",
+		Bio:  `<script>alert("Haha, you have been h4x0r3d!");</script>`,
 		Age:  112,
 		Meta: UserMeta{
 			Visits: 4,
