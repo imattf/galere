@@ -2,22 +2,19 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/imattf/galere/views"
 )
 
 // helper function...
 // execute template
 func executeTemplate(w http.ResponseWriter, filepath string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	// parse the gohtml file
-	tpl, err := template.ParseFiles(filepath)
-
+	// render the gohtml file
+	tmpl, err := views.Parse(filepath)
 	if err != nil {
 		log.Printf("parsing error on %v", err)
 		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
@@ -25,12 +22,7 @@ func executeTemplate(w http.ResponseWriter, filepath string) {
 	}
 
 	// render the gohtml file
-	err = tpl.Execute(w, nil)
-	if err != nil {
-		log.Printf("rendering error on %v", err)
-		http.Error(w, "There was an error rendering the template.", http.StatusInternalServerError)
-		return
-	}
+	tmpl.Execute(w, nil)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
