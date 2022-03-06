@@ -13,7 +13,8 @@ import (
 // helper function...
 // execute template
 func executeTemplate(w http.ResponseWriter, filepath string) {
-	// render the gohtml file
+
+	// parse a gohtml file
 	tmpl, err := views.Parse(filepath)
 	if err != nil {
 		log.Printf("parsing error on %v", err)
@@ -21,7 +22,7 @@ func executeTemplate(w http.ResponseWriter, filepath string) {
 		return
 	}
 
-	// render the gohtml file
+	// render a gohtml file
 	tmpl.Execute(w, nil)
 }
 
