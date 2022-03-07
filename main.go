@@ -2,44 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/imattf/galere/controllers"
 	"github.com/imattf/galere/views"
 )
-
-// helper function...
-// execute template
-func executeTemplate(w http.ResponseWriter, filepath string) {
-
-	// parse a gohtml file
-	tmpl, err := views.Parse(filepath)
-	if err != nil {
-		log.Printf("parsing error on %v", err)
-		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
-		return
-	}
-
-	// render a gohtml file
-	tmpl.Execute(w, nil)
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// parse & render the gohtml file w/ the new helper function
-	executeTemplate(w, "templates/home.gohtml")
-}
-
-func contactHandler(w http.ResponseWriter, r *http.Request) {
-	// parse & render the gohtml file w/ the new helper function
-	executeTemplate(w, "templates/contact.gohtml")
-}
-
-func faqHandler(w http.ResponseWriter, r *http.Request) {
-	// parse & render the gohtml file w/ the new helper function
-	executeTemplate(w, "templates/faq.gohtml")
-}
 
 func notfoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -60,19 +28,27 @@ func main() {
 	// a new chi router
 	r := chi.NewRouter()
 
-	// enable chi logging across app
-	// r.Use(middleware.Logger)
+	//Parse home template
+	tmpl, err := views.Parse("templates/home.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	r.Get("/", controllers.StaticHandler(tmpl))
 
-	// enable chi logging on single route
-	// ... but doesn't work :(
-	r.Route("/faqs", func(r chi.Router) {
-		r.Use(middleware.Logger)
-		r.Get("/faq", faqHandler)
-	})
+	//Parse contact template
+	tmpl, err = views.Parse("templates/contact.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	r.Get("/contact", controllers.StaticHandler(tmpl))
 
-	r.Get("/", homeHandler)
-	r.Get("/contact", contactHandler)
-	r.Get("/faq", faqHandler)
+	//Parse faq template
+	tmpl, err = views.Parse("templates/faq.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	r.Get("/faq", controllers.StaticHandler(tmpl))
+
 	r.NotFound(notfoundHandler)
 	r.Get("/user/{userID}", userHandler)
 	fmt.Println("Starting the galare server on :3000")
