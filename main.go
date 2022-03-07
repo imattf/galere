@@ -28,25 +28,16 @@ func main() {
 	// a new chi router
 	r := chi.NewRouter()
 
-	//Parse home template
-	tmpl, err := views.Parse("templates/home.gohtml")
-	if err != nil {
-		panic(err)
-	}
+	//Parse & Render home template
+	tmpl := views.Must(views.Parse("templates/home.gohtml"))
 	r.Get("/", controllers.StaticHandler(tmpl))
 
-	//Parse contact template
-	tmpl, err = views.Parse("templates/contact.gohtml")
-	if err != nil {
-		panic(err)
-	}
+	//Parse & Render contact template
+	tmpl = views.Must(views.Parse("templates/contact.gohtml"))
 	r.Get("/contact", controllers.StaticHandler(tmpl))
 
-	//Parse faq template
-	tmpl, err = views.Parse("templates/faq.gohtml")
-	if err != nil {
-		panic(err)
-	}
+	//Parse & Render faq template
+	tmpl = views.Must(views.Parse("templates/faq.gohtml"))
 	r.Get("/faq", controllers.StaticHandler(tmpl))
 
 	r.NotFound(notfoundHandler)
