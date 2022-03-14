@@ -40,6 +40,10 @@ func main() {
 	tmpl = views.Must(views.Parse("templates/faq.gohtml"))
 	r.Get("/faq", controllers.StaticHandler(tmpl))
 
+	//Parse & Render goo template
+	tmpl = views.Must(views.Parse("templates/goo.gohtml"))
+	r.Get("/goo", controllers.StaticHandler(tmpl))
+
 	r.NotFound(notfoundHandler)
 	r.Get("/user/{userID}", userHandler)
 	fmt.Println("Starting the galare server on :3000")
