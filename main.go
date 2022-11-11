@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/imattf/galere/controllers"
+	"github.com/imattf/galere/templates"
 	"github.com/imattf/galere/views"
 )
 
@@ -29,19 +30,19 @@ func main() {
 	r := chi.NewRouter()
 
 	//Parse & Render home template
-	tmpl := views.Must(views.Parse("templates/home.gohtml"))
+	tmpl := views.Must(views.ParseFS(templates.FS, "home.gohtml"))
 	r.Get("/", controllers.StaticHandler(tmpl))
 
 	//Parse & Render contact template
-	tmpl = views.Must(views.Parse("templates/contact.gohtml"))
+	tmpl = views.Must(views.ParseFS(templates.FS, "contact.gohtml"))
 	r.Get("/contact", controllers.StaticHandler(tmpl))
 
 	//Parse & Render faq template
-	tmpl = views.Must(views.Parse("templates/faq.gohtml"))
+	tmpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml"))
 	r.Get("/faq", controllers.StaticHandler(tmpl))
 
 	//Parse & Render goo template
-	tmpl = views.Must(views.Parse("templates/goo.gohtml"))
+	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml"))
 	r.Get("/goo", controllers.StaticHandler(tmpl))
 
 	r.NotFound(notfoundHandler)
