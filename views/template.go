@@ -45,7 +45,7 @@ func (t Template) Execute(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// render the gohtml file
-	err := t.htmlTmpl.Execute(w, nil)
+	err := t.htmlTmpl.Execute(w, data)
 	if err != nil {
 		log.Printf("rendering error on %v", err)
 		http.Error(w, "There was an error rendering the template.", http.StatusInternalServerError)

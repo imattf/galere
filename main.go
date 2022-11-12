@@ -39,7 +39,7 @@ func main() {
 
 	//Parse & Render faq template
 	tmpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml"))
-	r.Get("/faq", controllers.StaticHandler(tmpl))
+	r.Get("/faq", controllers.FAQ(tmpl))
 
 	//Parse & Render goo template
 	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml"))

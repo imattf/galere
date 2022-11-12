@@ -1,5 +1,17 @@
 <h1>FAQ Page</h1>
 
-<ul><b>Is this thing free?</b> Yes, this is free.</ul>
+<ul>
+  {{range .}}
+    {{template "qa" .}}
+  {{end}}
+</ul>
+
+{{/* <ul><b>Is this thing free?</b> Yes, this is free.</ul>
 <ul><b>Would you like a wake-up call?</b> Yes, I need to quit my job & go back to college.</ul>
-<ul><b>Who can help me here?</b> Please email me at <a href="mailto:matthew@faulkners.io">matthew@faulkners.io.</a></ul>
+<ul><b>Who can help me here?</b> Please email me at <a href="mailto:matthew@faulkners.io">matthew@faulkners.io.</a></ul> */}}
+
+{{/* <pre>{{.}}</pre> */}}
+
+{{define "qa"}}
+<li><b>{{.Question}}</b> {{.Answer}}</li>
+{{end}}
