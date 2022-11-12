@@ -30,19 +30,19 @@ func main() {
 	r := chi.NewRouter()
 
 	//Parse & Render home template
-	tmpl := views.Must(views.ParseFS(templates.FS, "layout-page.gohtml", "home.gohtml"))
+	tmpl := views.Must(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
 	r.Get("/", controllers.StaticHandler(tmpl))
 
 	//Parse & Render contact template
-	tmpl = views.Must(views.ParseFS(templates.FS, "layout-page.gohtml", "contact.gohtml"))
+	tmpl = views.Must(views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"))
 	r.Get("/contact", controllers.StaticHandler(tmpl))
 
 	//Parse & Render faq template
-	tmpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml"))
+	tmpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
 	r.Get("/faq", controllers.FAQ(tmpl))
 
 	//Parse & Render goo template
-	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml"))
+	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml", "tailwind.gohtml"))
 	r.Get("/goo", controllers.StaticHandler(tmpl))
 
 	r.NotFound(notfoundHandler)

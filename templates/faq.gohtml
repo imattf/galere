@@ -1,3 +1,5 @@
+
+{{template "header" .}}
 <h1>FAQ Page</h1>
 
 <ul>
@@ -11,6 +13,8 @@
 <ul><b>Who can help me here?</b> Please email me at <a href="mailto:matthew@faulkners.io">matthew@faulkners.io.</a></ul> */}}
 
 {{/* <pre>{{.}}</pre> */}}
+
+{{template "footer" .}}
 
 {{define "qa"}}
 <li><b>{{.Question}}</b> {{.Answer}}</li>
