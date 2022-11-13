@@ -41,6 +41,10 @@ func main() {
 	tmpl = views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
 	r.Get("/faq", controllers.FAQ(tmpl))
 
+	//Parse & Render signup template
+	tmpl = views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
+	r.Get("/signup", controllers.StaticHandler(tmpl))
+
 	//Parse & Render goo template
 	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml", "tailwind.gohtml"))
 	r.Get("/goo", controllers.StaticHandler(tmpl))
