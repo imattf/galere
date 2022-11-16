@@ -42,8 +42,14 @@ func main() {
 	r.Get("/faq", controllers.FAQ(tmpl))
 
 	//Parse & Render signup template
-	tmpl = views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
-	r.Get("/signup", controllers.StaticHandler(tmpl))
+	// tmpl = views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
+	// r.Get("/signup", controllers.StaticHandler(tmpl))
+	usersC := controllers.Users{}
+	usersC.Templates.New = views.Must(views.ParseFS(
+		templates.FS,
+		"signup.gohtml", "tailwind.gohtml",
+	))
+	r.Get("/signup", usersC.New)
 
 	//Parse & Render goo template
 	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml", "tailwind.gohtml"))
@@ -51,6 +57,7 @@ func main() {
 
 	r.NotFound(notfoundHandler)
 	r.Get("/user/{userID}", userHandler)
+
 	fmt.Println("Starting the galare server on :3000")
 	http.ListenAndServe(":3000", r)
 }
