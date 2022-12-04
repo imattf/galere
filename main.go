@@ -50,6 +50,7 @@ func main() {
 		"signup.gohtml", "tailwind.gohtml",
 	))
 	r.Get("/signup", usersC.New)
+	r.Post("/users", usersC.Create)
 
 	//Parse & Render goo template
 	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml", "tailwind.gohtml"))
