@@ -47,6 +47,12 @@ Start docker image
 docker compose up
 ```
 
+Stop docker image
+
+```bash
+docker compose down
+```
+
 ### Connect to postgres on docker container
 
 ```bash
