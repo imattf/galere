@@ -79,8 +79,7 @@ CREATE TABLE users (
 ### Insert records
 
 ```sql
-INSERT INTO users (age, email, first_name, last_name)
-VALUES (30, 'bob@aol.com', 'Bob', 'Aol');
+INSERT INTO users (age, email, first_name, last_name) VALUES (30, 'bob@aol.com', 'Bob','Aol');
 ```
 ### Comments in SQL
 
