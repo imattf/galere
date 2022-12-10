@@ -63,7 +63,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Tables created.")
+	fmt.Println("Tables checked/created.")
 
 	// name := "Jon Calhoun"
 	// email := "jon@calhoun.io"
@@ -76,16 +76,31 @@ func main() {
 	// }
 	// fmt.Println("User created.")
 
-	name := "Bob Aol"
-	email := "bob@aol.com"
+	// name := "Bob Aol"
+	// email := "bob@aol.com"
+	// row := db.QueryRow(`
+	//   INSERT INTO users(name, email)
+	//   VALUES($1, $2) RETURNING id;`, name, email)
+	// var id int
+	// err = row.Scan(&id)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println("User created. id=", id)
+
+	id := 22
 	row := db.QueryRow(`
-	  INSERT INTO users(name, email)
-	  VALUES($1, $2) RETURNING id;`, name, email)
-	var id int
-	err = row.Scan(&id)
+	  SELECT name, email
+	  FROM users
+	  WHERE id=$1;`, id)
+	var name, email string
+	err = row.Scan(&name, &email)
+	if err == sql.ErrNoRows {
+		fmt.Println("No records found!")
+	}
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("User created. id=", id)
+	fmt.Printf("User info: name=%s email=%s\n", name, email)
 
 }
