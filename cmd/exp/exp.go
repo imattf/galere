@@ -20,6 +20,13 @@ func (cfg PostgresConfig) String() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database, cfg.SSLMode)
 }
 
+type Order struct {
+	ID          int
+	UserID      int
+	Amount      int
+	Description string
+}
+
 func main() {
 	cfg := PostgresConfig{
 		Host:     "localhost",
@@ -103,16 +110,45 @@ func main() {
 	// }
 	// fmt.Printf("User info: name=%s email=%s\n", name, email)
 
+	// userID := 2
+	// for i := 1; i <= 5; i++ {
+	// 	amount := i * 100
+	// 	desc := fmt.Sprintf("Fake order #%d", i)
+	// 	_, err := db.Exec(`
+	// 	  INSERT INTO orders(user_id, amount, description)
+	// 	  VALUES($1, $2, $3)`, userID, amount, desc)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }
+	// fmt.Println("Created fake orders.")
+
+	var orders []Order
+
+	// read all the records for a user into rows
 	userID := 2
-	for i := 1; i <= 5; i++ {
-		amount := i * 100
-		desc := fmt.Sprintf("Fake order #%d", i)
-		_, err := db.Exec(`
-		  INSERT INTO orders(user_id, amount, description)
-		  VALUES($1, $2, $3)`, userID, amount, desc)
+	rows, err := db.Query(`
+	  SELECT id, amount, description
+	  FROM orders
+	  WHERE user_id=$1`, userID)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	// add all the read records into a order struct & print
+	for rows.Next() {
+		var order Order
+		order.UserID = userID
+		err := rows.Scan(&order.ID, &order.Amount, &order.Description)
 		if err != nil {
 			panic(err)
 		}
+		orders = append(orders, order)
 	}
-	fmt.Println("Created fake orders.")
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Orders:", orders)
 }
