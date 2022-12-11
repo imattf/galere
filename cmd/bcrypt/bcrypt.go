@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
@@ -24,7 +26,11 @@ func main() {
 }
 
 func hash(password string) {
-	fmt.Printf("TODO: Hash the password %q\n", password)
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Printf("error hashing: %v\n", password)
+	}
+	fmt.Printf("Hashed value the password %q is %v\n", password, string(hashedBytes))
 }
 
 func compare(password, hash string) {
