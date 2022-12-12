@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/imattf/galere/models"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
@@ -52,25 +53,34 @@ func main() {
 
 	fmt.Println("Connected!")
 
-	// Create Table...
-	_, err = db.Exec(`
-	  CREATE TABLE IF NOT EXISTS users (
-		id SERIAL PRIMARY KEY,
-		name TEXT,
-		email TEXT NOT NULL
-	  );
-	  
-	  CREATE TABLE IF NOT EXISTS orders (
-		id SERIAL PRIMARY KEY,
-		user_id INT NOT NULL,
-		amount INT,
-		description TEXT
-	  );
-	`)
+	us := models.UserService{
+		DB: db,
+	}
+	user, err := us.Create("bob@bob.com", "bob123")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Tables checked/created.")
+	fmt.Println(user)
+
+	// Create Table...
+	// _, err = db.Exec(`
+	//   CREATE TABLE IF NOT EXISTS users (
+	// 	id SERIAL PRIMARY KEY,
+	// 	name TEXT,
+	// 	email TEXT NOT NULL
+	//   );
+
+	//   CREATE TABLE IF NOT EXISTS orders (
+	// 	id SERIAL PRIMARY KEY,
+	// 	user_id INT NOT NULL,
+	// 	amount INT,
+	// 	description TEXT
+	//   );
+	// `)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println("Tables checked/created.")
 
 	// name := "Jon Calhoun"
 	// email := "jon@calhoun.io"
@@ -123,32 +133,33 @@ func main() {
 	// }
 	// fmt.Println("Created fake orders.")
 
-	var orders []Order
+	//TODO Uncomment from here down...
+	// 	var orders []Order
 
-	// read all the records for a user into rows
-	userID := 2
-	rows, err := db.Query(`
-	  SELECT id, amount, description
-	  FROM orders
-	  WHERE user_id=$1`, userID)
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
+	// 	// read all the records for a user into rows
+	// 	userID := 2
+	// 	rows, err := db.Query(`
+	// 	  SELECT id, amount, description
+	// 	  FROM orders
+	// 	  WHERE user_id=$1`, userID)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	defer rows.Close()
 
-	// add all the read records into a order struct & print
-	for rows.Next() {
-		var order Order
-		order.UserID = userID
-		err := rows.Scan(&order.ID, &order.Amount, &order.Description)
-		if err != nil {
-			panic(err)
-		}
-		orders = append(orders, order)
-	}
-	err = rows.Err()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Orders:", orders)
+	// 	// add all the read records into a order struct & print
+	// 	for rows.Next() {
+	// 		var order Order
+	// 		order.UserID = userID
+	// 		err := rows.Scan(&order.ID, &order.Amount, &order.Description)
+	// 		if err != nil {
+	// 			panic(err)
+	// 		}
+	// 		orders = append(orders, order)
+	// 	}
+	// 	err = rows.Err()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	fmt.Println("Orders:", orders)
 }
