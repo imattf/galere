@@ -53,6 +53,10 @@ Stop docker image
 docker compose down
 ```
 
+
+### Connect to Adminer
+http://localhost:3333
+
 ### Connect to postgres on docker container
 
 ```bash

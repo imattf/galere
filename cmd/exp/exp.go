@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/imattf/galere/models"
@@ -29,23 +28,26 @@ type Order struct {
 }
 
 func main() {
-	cfg := PostgresConfig{
-		Host:     "localhost",
-		Port:     "5432",
-		User:     "baloo",
-		Password: "junglebook",
-		Database: "lenslocked",
-		SSLMode:  "disable",
-	}
+	// cfg := PostgresConfig{
+	// 	Host:     "localhost",
+	// 	Port:     "5432",
+	// 	User:     "baloo",
+	// 	Password: "junglebook",
+	// 	Database: "lenslocked",
+	// 	SSLMode:  "disable",
+	// }
 
 	// db, err := sql.Open("pgx", "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable")
 
-	db, err := sql.Open("pgx", cfg.String())
+	// db, err := sql.Open("pgx", cfg.String())
 
+	cfg := models.DefaultPostgresConfig()
+	db, err := models.Open(cfg)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+
 	err = db.Ping()
 	if err != nil {
 		panic(err)
@@ -56,7 +58,7 @@ func main() {
 	us := models.UserService{
 		DB: db,
 	}
-	user, err := us.Create("bob@bob.com", "bob123")
+	user, err := us.Create("bob4@bob.com", "bob123")
 	if err != nil {
 		panic(err)
 	}
