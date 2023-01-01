@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/imattf/galere/models"
 )
@@ -46,24 +45,20 @@ func (u Users) Signin(w http.ResponseWriter, r *http.Request) {
 	u.Templates.Signin.Execute(w, data)
 }
 
-func (us UserService) Authenticate(email, password string) (*User, error) {
-	email = strings.ToLower(email)
-	user := User{
-		Email: email,
+func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Email    string
+		Password string
 	}
+	data.Email = r.FormValue("email")
+	data.Password = r.FormValue("password")
 
-	row := us.DB.QueryRow(`
-		SELECT id, password_hash
-		FROM users WHERE email=$1`, email)
-	err := row.Scan(&user.ID, &user.PasswordHash)
+	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
-		return nil, fmt.Errorf("authenticate: %w", err)
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
 	}
 
-	err = bcrypt.CompareHashAnPassword([]byte(user.PasswordHash), []byte(password))
-	if err != nil {
-		return nil, fmt.Errorf("authenticate: %w", error)
-	}
-
-	return &user, nil
+	fmt.Fprintf(w, "User authenticated: %+v", user)
 }
