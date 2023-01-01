@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/imattf/galere/controllers"
+	"github.com/imattf/galere/models"
 	"github.com/imattf/galere/templates"
 	"github.com/imattf/galere/views"
 )
@@ -44,7 +45,27 @@ func main() {
 	//Parse & Render signup template
 	// tmpl = views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
 	// r.Get("/signup", controllers.StaticHandler(tmpl))
-	usersC := controllers.Users{}
+
+	// Setup a database connection
+	cfg := models.DefaultPostgresConfig()
+	db, err := models.Open(cfg)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// Setup our model services
+	userService := models.UserService{
+		DB: db,
+	}
+
+	// Setup of controllers
+	usersC := controllers.Users{
+		UserService: &userService,
+	}
+
+	// usersC := controllers.Users{}
+
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS,
 		"signup.gohtml", "tailwind.gohtml",
