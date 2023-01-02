@@ -1,6 +1,12 @@
 # bcrypt stuff...
 
 
+run bcrypt to create a hash from password
+
+```bash
+go run cmd/bcrypt/bcrypt.go hash <password>
+```
+
 run bcrypt to see if hashes match
 
 ```bash

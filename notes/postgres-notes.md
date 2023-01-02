@@ -41,10 +41,14 @@ services:
       - 3333:8080
 ```
 
+Run Adminer
+http://localhost:3333/
+
+
 Start docker image
 
 ```bash
-docker compose up
+docker compose up [-d] 
 ```
 
 Stop docker image

@@ -80,6 +80,7 @@ func main() {
 	r.Post("/users", usersC.Create)
 	r.Get("/signin", usersC.Signin)
 	r.Post("/signin", usersC.ProcessSignIn)
+	r.Get("/users/me", usersC.CurrentUser)
 
 	//Parse & Render goo template
 	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml", "tailwind.gohtml"))
