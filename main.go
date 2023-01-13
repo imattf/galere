@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/csrf"
 	"github.com/imattf/galere/controllers"
 	"github.com/imattf/galere/models"
 	"github.com/imattf/galere/templates"
@@ -81,6 +82,8 @@ func main() {
 	r.Get("/signin", usersC.Signin)
 	r.Post("/signin", usersC.ProcessSignIn)
 	r.Get("/users/me", usersC.CurrentUser)
+	r.Get("/users/me", usersC.CurrentUser)
+	// r.Get("/users/me", TimerMiddleware(usersC.CurrentUser))   //wrap with middleware
 
 	//Parse & Render goo template
 	tmpl = views.Must(views.ParseFS(templates.FS, "goo.gohtml", "tailwind.gohtml"))
@@ -90,5 +93,24 @@ func main() {
 	r.Get("/user/{userID}", userHandler)
 
 	fmt.Println("Starting the galare server on :3000")
-	http.ListenAndServe(":3000", r)
+
+	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	csrfMw := csrf.Protect(
+		[]byte(csrfKey),
+		// TODO: Fix this before deploying to prod
+		csrf.Secure(false),
+	)
+	// http.ListenAndServe(":3000", TimerMiddleware(r.ServeHTTP))  //wrap with middleware
+	// http.ListenAndServe(":3000", r)  //orig
+	http.ListenAndServe(":3000", csrfMw(r)) //with csrf Middleware
+
 }
+
+// Middleware function...
+// func TimerMiddleware(h http.HandlerFunc) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		start := time.Now()
+// 		h(w, r)
+// 		fmt.Println("request time:", time.Since(start))
+// 	}
+// }
