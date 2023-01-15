@@ -1,8 +1,10 @@
 package views
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -21,9 +23,9 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tmpl := template.New(patterns[0])
 	tmpl = tmpl.Funcs(
 		template.FuncMap{
-			"csrfField": func() template.HTML {
-				// return ` <input type="hidden" />`
-				return ` <!-- TODO: Placeholder to implement the csrfField payload -->`
+			"csrfField": func() (template.HTML, error) {
+				// return ` <!-- TODO: Placeholder to implement the csrfField payload -->`
+				return "", fmt.Errorf("csrfField not implemented")
 			},
 		},
 	)
@@ -69,12 +71,14 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 	)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
 	// render the gohtml file
-	err = tmpl.Execute(w, data)
+	// err = tmpl.Execute(w, data)
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		log.Printf("rendering error on %v", err)
 		http.Error(w, "There was an error rendering the template.", http.StatusInternalServerError)
 		return
 	}
+	io.Copy(w, &buf)
 }
