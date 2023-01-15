@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/csrf"
 )
 
 func Must(t Template, err error) Template {
@@ -20,7 +22,8 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tmpl = tmpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() template.HTML {
-				return `<input type="hidden" />`
+				// return ` <input type="hidden" />`
+				return ` <!-- TODO: Placeholder to implement the csrfField payload -->`
 			},
 		},
 	)
@@ -50,10 +53,25 @@ type Template struct {
 
 // helper function...
 func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}) {
+	tmpl, err := t.htmlTmpl.Clone()
+	if err != nil {
+		log.Printf("cloning template: %v", err)
+		http.Error(w, "There was an error rendering the page", http.StatusInternalServerError)
+		return
+	}
+
+	tmpl = tmpl.Funcs(
+		template.FuncMap{
+			"csrfField": func() template.HTML {
+				return csrf.TemplateField(r)
+			},
+		},
+	)
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// render the gohtml file
-	err := t.htmlTmpl.Execute(w, data)
+	err = tmpl.Execute(w, data)
 	if err != nil {
 		log.Printf("rendering error on %v", err)
 		http.Error(w, "There was an error rendering the template.", http.StatusInternalServerError)
