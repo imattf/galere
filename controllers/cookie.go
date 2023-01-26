@@ -16,7 +16,7 @@ func newCookie(name, value string) *http.Cookie {
 		Path:     "/",
 		HttpOnly: true,
 	}
-	reutn & cookie
+	return &cookie
 }
 
 func setCookie(w http.ResponseWriter, name, value string) {
