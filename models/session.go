@@ -50,20 +50,29 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 		TokenHash: ss.hash(token),
 	}
 	// Update the session in our DB
+	// row := ss.DB.QueryRow(`
+	// 	UPDATE sessions
+	// 	SET token_hash = $2
+	// 	WHERE user_id = $1
+	// 	RETURNING id;`, session.UserID, session.TokenHash)
+	// err = row.Scan(&session.ID)
+	// if err == sql.ErrNoRows {
+	// 	// Store the session in our DB
+	// 	row = ss.DB.QueryRow(`
+	// 		INSERT INTO sessions (user_id, token_hash)
+	// 		VALUES ($1, $2)
+	// 		RETURNING id;`, session.UserID, session.TokenHash)
+	// 	err = row.Scan(&session.ID)
+	// }
+	// Update or store (on-conflict) the session object
 	row := ss.DB.QueryRow(`
-		UPDATE sessions
+		INSERT INTO sessions (user_id, token_hash)
+		VALUES ($1, $2) ON CONFLICT (user_id) DO
+		UPDATE
 		SET token_hash = $2
-		WHERE user_id = $1
 		RETURNING id;`, session.UserID, session.TokenHash)
 	err = row.Scan(&session.ID)
-	if err == sql.ErrNoRows {
-		// Store the session in our DB
-		row = ss.DB.QueryRow(`
-			INSERT INTO sessions (user_id, token_hash)
-			VALUES ($1, $2)
-			RETURNING id;`, session.UserID, session.TokenHash)
-		err = row.Scan(&session.ID)
-	}
+
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
 	}
