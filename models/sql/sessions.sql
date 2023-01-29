@@ -1,5 +1,5 @@
 CREATE TABLE sessions (
     id SERIAL PRIMARY KEY,
-    user_id INT UNIUE,
+    user_id INT UNIQUE REFERENCES user_id (id) ON DELETE CASCADE,
     token_hash TEXT UNIQUE NOT NULL
 );
