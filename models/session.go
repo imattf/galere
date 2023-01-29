@@ -76,20 +76,34 @@ func (ss *SessionService) User(token string) (*User, error) {
 	tokenHash := ss.hash(token)
 
 	// 2. Query for the session w/ that hash
+	// var user User
+	// row := ss.DB.QueryRow(`
+	// SELECT user_id
+	// FROM sessions
+	// where TOKEN_HASH = $1;`, tokenHash)
+	// err := row.Scan(&user.ID)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("user: %w", err)
+	// }
+	// // 3. Using the UserID from session, query for that user
+	// row = ss.DB.QueryRow(`
+	// SELECT email, password_hash
+	// FROM users WHERE id = $1;`, user.ID)
+	// err = row.Scan(&user.Email, &user.PasswordHash)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("user: %w", err)
+	// }
+
+	// Slimmed down version 2 & 3 consolidated with join...
 	var user User
 	row := ss.DB.QueryRow(`
-	SELECT user_id
+	SELECT user_id,
+	  users.email,
+	  users.password_hash
 	FROM sessions
-	where TOKEN_HASH = $1;`, tokenHash)
-	err := row.Scan(&user.ID)
-	if err != nil {
-		return nil, fmt.Errorf("user: %w", err)
-	}
-	// 3. Using the UserID from session, query for that user
-	row = ss.DB.QueryRow(`
-	SELECT email, password_hash
-	FROM users WHERE id = $1;`, user.ID)
-	err = row.Scan(&user.Email, &user.PasswordHash)
+	  JOIN users ON users.id = sessions.user_id
+	where sessions.token_hash = $1;`, tokenHash)
+	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("user: %w", err)
 	}
