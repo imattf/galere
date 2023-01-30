@@ -132,9 +132,14 @@ goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=l
 goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" up
 ```
 
-### this undoes the goose changes in the db...
+### this undoes the last goose change in the db...
 ```
 goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" down
+```
+
+### this rests all the goose changes in the db...
+```
+goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" reset
 ```
 --- 
 

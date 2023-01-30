@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 	"github.com/imattf/galere/controllers"
+	"github.com/imattf/galere/migrations"
 	"github.com/imattf/galere/models"
 	"github.com/imattf/galere/templates"
 	"github.com/imattf/galere/views"
@@ -60,7 +61,8 @@ func main() {
 	defer db.Close()
 
 	// Migration tool goose...
-	err = models.Migrate(db, "migrations")
+	// err = models.Migrate(db, "migrations")
+	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
 		panic(err)
 	}
