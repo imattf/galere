@@ -108,3 +108,20 @@ WHERE age < 20 AND age > 12;
 DELETE FROM users
 WHERE id = 1;
 ```
+
+# Migration stuff...
+
+## goose...
+
+command format...
+goose <database-type> <"host=connect-string"> subcommand
+
+### this builds the goose tables in the db...
+```
+goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" status
+```
+
+### this runs the goose files in the db...
+```
+goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" up
+```

@@ -49,6 +49,10 @@ func main() {
 
 	// Setup a database connection
 	cfg := models.DefaultPostgresConfig()
+
+	// Display connect string for Migration set-up
+	// fmt.Println(cfg.String())
+
 	db, err := models.Open(cfg)
 	if err != nil {
 		panic(err)
