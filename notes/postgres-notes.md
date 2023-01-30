@@ -111,17 +111,49 @@ WHERE id = 1;
 
 # Migration stuff...
 
+Need to clear out the existing database before running?
+```
+docker compose down
+docker compose up -d
+```
+
 ## goose...
 
 command format...
 goose <database-type> <"host=connect-string"> subcommand
 
-### this builds the goose tables in the db...
+### this builds the goose tables in the db if not there at status check...
 ```
 goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" status
 ```
 
-### this runs the goose files in the db...
+### this applies the goose changes in the db...
 ```
 goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" up
 ```
+
+### this undoes the goose changes in the db...
+```
+goose postgres "host=localhost port=5432 user=baloo password=junglebook dbname=lenslocked sslmode=disable" down
+```
+--- 
+
+### Jon's goose workflow
+
+My Workflow with Goose
+
+My typical workflow is to keep the timestamps while developing a feature, then when I am ready to submit changes I will:
+
+    goose down or goose reset
+    git stash to stash my current changes
+    git pull origin <main branch> --rebase to rebase my branch with any changes other devs have submitted.
+    git stash apply to apply the changes i stashed
+    goose fix to rename my migrations with new versions
+    goose up and verify migrations work with new versions
+    commit to main branch
+
+Reviews may slow
+
+Doing this will help ensure that you wait until the last possible minute to set a fixed version number and reduce the odds of conflicts.
+
+Goose suggests a slightly different approach of hybrid versioning that can also be explored.
