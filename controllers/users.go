@@ -100,7 +100,6 @@ func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/signin", http.StatusFound)
 		return
 	}
-	fmt.Fprintf(w, "Current user: %s\n", user.Email)
 
 	// // tokenCookie, err := r.Cookie("session")
 	// token, err := readCookie(r, CookieSession)
@@ -135,4 +134,48 @@ func (u Users) ProcessSignOut(w http.ResponseWriter, r *http.Request) {
 	// Delete the user's cookie
 	deleteCookie(w, CookieSession)
 	http.Redirect(w, r, "/signin", http.StatusFound)
+}
+
+// User Middleware...
+type UserMiddleware struct {
+	SessionService *models.SessionService
+}
+
+func (umw UserMiddleware) SetUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Add logic for the SetUser middleware, then call next.ServeHTTP(w, r)
+
+		// First try to read the cookie and set the user in the context if it can
+		token, err := readCookie(r, CookieSession)
+		if err != nil {
+			// Cannot lookup the user with no cookie, so proceed w/out
+			// user being set, then return
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// If we have a token, lookup the user by the token
+		user, err := umw.SessionService.User(token)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// If we get to here, we have a user that can store in the context
+
+		// Get the context
+		ctx := r.Context()
+
+		// We need to derive a new context to store values.
+		// Be certain to import our own context package (and not stdctx)
+		ctx = context.WithUser(ctx, user)
+
+		// Next we need to get a request that uses our new context.
+		// We call WithContext function and it returns a new request w/ the context set.
+		r = r.WithContext(ctx)
+
+		// Finally we call the handler that our middleware was applied to
+		// with the updated request.
+		next.ServeHTTP(w, r)
+	})
 }

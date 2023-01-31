@@ -23,5 +23,6 @@ func User(ctx context.Context) *models.User {
 		// guard against nothing being stored in context
 		return nil
 	}
+	// fmt.Println(user)
 	return user
 }

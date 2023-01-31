@@ -109,7 +109,10 @@ func main() {
 	r.NotFound(notfoundHandler)
 	r.Get("/user/{userID}", userHandler)
 
-	fmt.Println("Starting the galare server on :3000")
+	// Instantiate the middleware
+	umw := controllers.UserMiddleware{
+		SessionService: &sessionService,
+	}
 
 	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
 	csrfMw := csrf.Protect(
@@ -117,9 +120,12 @@ func main() {
 		// TODO: Fix this before deploying to prod
 		csrf.Secure(false),
 	)
+
+	fmt.Println("Starting the galare server on :3000")
 	// http.ListenAndServe(":3000", TimerMiddleware(r.ServeHTTP))  //wrap with middleware
 	// http.ListenAndServe(":3000", r)  //orig
-	http.ListenAndServe(":3000", csrfMw(r)) //with csrf Middleware
+	// http.ListenAndServe(":3000", csrfMw(r)) //with csrf Middleware
+	http.ListenAndServe(":3000", csrfMw(umw.SetUser(r))) //with csrf Middleware wrapped in another Middleware
 
 }
 
