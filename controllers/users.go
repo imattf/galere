@@ -96,26 +96,10 @@ func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user := context.User(ctx)
-	if user == nil {
-		http.Redirect(w, r, "/signin", http.StatusFound)
-		return
-	}
-
-	// // tokenCookie, err := r.Cookie("session")
-	// token, err := readCookie(r, CookieSession)
-	// if err != nil {
-	// 	fmt.Println(err)
+	// if user == nil {
 	// 	http.Redirect(w, r, "/signin", http.StatusFound)
 	// 	return
 	// }
-	// // user, err := u.SessionService.User(tokenCookie.Value)
-	// user, err := u.SessionService.User(token)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	http.Redirect(w, r, "/signin", http.StatusFound)
-	// 	return
-	// }
-
 	fmt.Fprintf(w, "Current user: %s\n", user.Email)
 }
 
@@ -176,6 +160,18 @@ func (umw UserMiddleware) SetUser(next http.Handler) http.Handler {
 
 		// Finally we call the handler that our middleware was applied to
 		// with the updated request.
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (umw UserMiddleware) RequireUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := context.User(ctx)
+		if user == nil {
+			http.Redirect(w, r, "/signin", http.StatusFound)
+			return
+		}
 		next.ServeHTTP(w, r)
 	})
 }
