@@ -10,6 +10,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/csrf"
+	"github.com/imattf/galere/context"
+	"github.com/imattf/galere/models"
 )
 
 func Must(t Template, err error) Template {
@@ -24,8 +26,10 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	tmpl = tmpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() (template.HTML, error) {
-				// return ` <!-- TODO: Placeholder to implement the csrfField payload -->`
 				return "", fmt.Errorf("csrfField not implemented")
+			},
+			"currentUser": func() (*models.User, error) {
+				return nil, fmt.Errorf("currentUser not implemented")
 			},
 		},
 	)
@@ -66,6 +70,9 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		template.FuncMap{
 			"csrfField": func() template.HTML {
 				return csrf.TemplateField(r)
+			},
+			"currentUser": func() *models.User {
+				return context.User(r.Context())
 			},
 		},
 	)
