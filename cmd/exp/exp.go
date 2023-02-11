@@ -1,3 +1,5 @@
+// Fun with postgres...
+
 package main
 
 import (
