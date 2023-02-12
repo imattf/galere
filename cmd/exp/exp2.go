@@ -18,20 +18,21 @@ const (
 func main() {
 	fmt.Println("Hello email stuff...")
 
-	email := models.Email{
-		From:      "test@faulkners.io",
-		To:        "bob@aol.com",
-		Subject:   "This is a test email",
-		Plaintext: "This the body of the email",
-		HTML:      `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`,
-	}
+	// email := models.Email{
+	// 	From:      "test@faulkners.io",
+	// 	To:        "bob@aol.com",
+	// 	Subject:   "This is a test email",
+	// 	Plaintext: "This the body of the email",
+	// 	HTML:      `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`,
+	// }
 	es := models.NewEmailService(models.SMTPConfig{
 		Host:     host,
 		Port:     port,
 		Username: username,
 		Password: password,
 	})
-	err := es.Send(email)
+	// err := es.Send(email)
+	err := es.ForgotPassword("bob@aol.com", "https://lenslocked.com/reset-pw?token=abc123")
 	if err != nil {
 		panic(err)
 	}
