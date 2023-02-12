@@ -5,7 +5,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/go-mail/mail/v2"
+	"github.com/imattf/galere/models"
 )
 
 const (
@@ -18,21 +18,39 @@ const (
 func main() {
 	fmt.Println("Hello email stuff...")
 
-	from := "test@faulkners.io"
-	to := "bob@aol.com"
-	subject := "This is a test email"
-	plaintext := "This the body of the email"
-	html := `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`
+	email := models.Email{
+		From:      "test@faulkners.io",
+		To:        "bob@aol.com",
+		Subject:   "This is a test email",
+		Plaintext: "This the body of the email",
+		HTML:      `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`,
+	}
+	es := models.NewEmailService(models.SMTPConfig{
+		Host:     host,
+		Port:     port,
+		Username: username,
+		Password: password,
+	})
+	err := es.Send(email)
+	if err != nil {
+		panic(err)
+	}
 
-	msg := mail.NewMessage()
-	msg.SetHeader("To", to)
-	msg.SetHeader("From", from)
-	msg.SetHeader("Subject", subject)
-	msg.SetBody("text/plain", plaintext)
-	msg.AddAlternative("text/html", html)
-	// msg.WriteTo(os.Stdout)
+	// from := "test@faulkners.io"
+	// to := "bob@aol.com"
+	// subject := "This is a test email"
+	// plaintext := "This the body of the email"
+	// html := `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`
 
-	dialer := mail.NewDialer(host, port, username, password)
+	// msg := mail.NewMessage()
+	// msg.SetHeader("To", to)
+	// msg.SetHeader("From", from)
+	// msg.SetHeader("Subject", subject)
+	// msg.SetBody("text/plain", plaintext)
+	// msg.AddAlternative("text/html", html)
+	// // msg.WriteTo(os.Stdout)
+
+	// dialer := mail.NewDialer(host, port, username, password)
 
 	// Dial and SendCloser method...
 	// sender, err := dialer.Dial()
@@ -49,11 +67,11 @@ func main() {
 	// fmt.Println("...Message Sent")
 
 	// DialandSend method...
-	err := dialer.DialAndSend(msg)
-	if err != nil {
-		// TODO: Handle the error correctly
-		panic(err)
-	}
+	// err := dialer.DialAndSend(msg)
+	// if err != nil {
+	// 	// TODO: Handle the error correctly
+	// 	panic(err)
+	// }
 
 	fmt.Println("...Message Sent")
 }
