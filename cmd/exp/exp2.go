@@ -11,8 +11,8 @@ import (
 const (
 	host     = "sandbox.smtp.mailtrap.io"
 	port     = 587
-	username = "b509d12c91911f"
-	password = "90171c99a302fd"
+	username = "b5316f30395b9d"
+	password = "348e7e664ef1a6"
 )
 
 func main() {
