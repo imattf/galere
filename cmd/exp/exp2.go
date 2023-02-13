@@ -4,75 +4,45 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 
 	"github.com/imattf/galere/models"
-)
-
-const (
-	host     = "sandbox.smtp.mailtrap.io"
-	port     = 587
-	username = "b5316f30395b9d"
-	password = "348e7e664ef1a6"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	// Using .env file...
+	fmt.Println("Hello .env stuff...")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	host := os.Getenv("SMTP_HOST")
+	portStr := os.Getenv("SMTP_PORT")
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		panic(err)
+	}
+	username := os.Getenv("SMTP_USERNAME")
+	password := os.Getenv("SMTP_PASSWORD")
+
+	// Email setup testing...
 	fmt.Println("Hello email stuff...")
 
-	// email := models.Email{
-	// 	From:      "test@faulkners.io",
-	// 	To:        "bob@aol.com",
-	// 	Subject:   "This is a test email",
-	// 	Plaintext: "This the body of the email",
-	// 	HTML:      `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`,
-	// }
 	es := models.NewEmailService(models.SMTPConfig{
 		Host:     host,
 		Port:     port,
 		Username: username,
 		Password: password,
 	})
-	// err := es.Send(email)
-	err := es.ForgotPassword("bob@aol.com", "https://lenslocked.com/reset-pw?token=abc123")
+
+	err = es.ForgotPassword("bob@aol.com", "https://lenslocked.com/reset-pw?token=abc123")
 	if err != nil {
 		panic(err)
 	}
-
-	// from := "test@faulkners.io"
-	// to := "bob@aol.com"
-	// subject := "This is a test email"
-	// plaintext := "This the body of the email"
-	// html := `<h1>Hi Bob!</h1><p>This is email</p><p>Please enjoy</p>`
-
-	// msg := mail.NewMessage()
-	// msg.SetHeader("To", to)
-	// msg.SetHeader("From", from)
-	// msg.SetHeader("Subject", subject)
-	// msg.SetBody("text/plain", plaintext)
-	// msg.AddAlternative("text/html", html)
-	// // msg.WriteTo(os.Stdout)
-
-	// dialer := mail.NewDialer(host, port, username, password)
-
-	// Dial and SendCloser method...
-	// sender, err := dialer.Dial()
-	// if err != nil {
-	// 	// TODO: Handle the error correctly
-	// 	panic(err)
-	// }
-	// defer sender.Close()
-	// err = sender.Send(from, []string{to}, msg)
-	// if err != nil {
-	// 	// TODO Handle the error correctly
-	// 	panic(err)
-	// }
-	// fmt.Println("...Message Sent")
-
-	// DialandSend method...
-	// err := dialer.DialAndSend(msg)
-	// if err != nil {
-	// 	// TODO: Handle the error correctly
-	// 	panic(err)
-	// }
 
 	fmt.Println("...Message Sent")
 }

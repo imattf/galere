@@ -27,3 +27,4 @@ images/**
 
 # sensitive files that should not be in repo
 .config
+.env
