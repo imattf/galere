@@ -9,7 +9,7 @@ import (
 const (
 	// DefaultResetDuration is the default time that
 	// a PasswordReset is valid for.
-	DefaultResetDuration = 1 * time.Time
+	DefaultResetDuration = 1 * time.Hour
 )
 
 type PasswordReset struct {
