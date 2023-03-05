@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
@@ -11,7 +13,50 @@ import (
 	"github.com/imattf/galere/models"
 	"github.com/imattf/galere/templates"
 	"github.com/imattf/galere/views"
+	"github.com/joho/godotenv"
 )
+
+type config struct {
+	PSQL models.PostgresConfig
+	SMTP models.SMTPConfig
+	CSRF struct {
+		Key    string
+		Secure bool
+	}
+	Server struct {
+		Address string
+	}
+}
+
+func loadEnvConfig() (config, error) {
+	var cfg config
+
+	err := godotenv.Load()
+	if err != nil {
+		return cfg, err
+	}
+	// TODO: Read the PSQL values from ENV variable
+	cfg.PSQL = models.DefaultPostgresConfig()
+
+	// TODO: SMTP
+	cfg.SMTP.Host = os.Getenv("SMTP_HOST")
+	portStr := os.Getenv("SMTP_PORT")
+	cfg.SMTP.Port, err = strconv.Atoi(portStr)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.SMTP.Username = os.Getenv("SMTP_USERNAME")
+	cfg.SMTP.Password = os.Getenv("SMTP_PASSWORD")
+
+	// TODO: Read the CSRF values from an ENV variable
+	cfg.CSRF.Key = "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	cfg.CSRF.Secure = false
+
+	// TODO: Read the server values from an ENV variable
+	cfg.Server.Address = ":3000"
+
+	return cfg, nil
+}
 
 // Page Not Found...
 func notfoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,14 +75,18 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	cfg, err := loadEnvConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	// Setup Database...
-	cfg := models.DefaultPostgresConfig()
-	// fmt.Println(cfg.String()) //display connect string for Migration set-up
-	db, err := models.Open(cfg)
+	db, err := models.Open(cfg.PSQL)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+
 	//...migration tool goose
 	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
@@ -45,28 +94,33 @@ func main() {
 	}
 
 	// Setup Model Services...
-	userService := models.UserService{
+	userService := &models.UserService{
 		DB: db,
 	}
-	sessionService := models.SessionService{
+	sessionService := &models.SessionService{
 		DB: db,
 	}
+	pwResetService := &models.PasswordResetService{
+		DB: db,
+	}
+	emailService := models.NewEmailService(cfg.SMTP)
 
 	// Setup Middleware...
 	umw := controllers.UserMiddleware{
-		SessionService: &sessionService,
+		SessionService: sessionService,
 	}
-	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	// csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
 	csrfMw := csrf.Protect(
-		[]byte(csrfKey),
-		// TODO: Fix this before deploying to prod
-		csrf.Secure(false),
+		[]byte(cfg.CSRF.Key),
+		csrf.Secure(cfg.CSRF.Secure),
 	)
 
 	// Setup Controllers...
 	usersC := controllers.Users{
-		UserService:    &userService,
-		SessionService: &sessionService,
+		UserService:          userService,
+		SessionService:       sessionService,
+		PasswordResetService: pwResetService,
+		EmailService:         emailService,
 	}
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS,
@@ -114,7 +168,10 @@ func main() {
 	r.NotFound(notfoundHandler)
 
 	// Start the Server...
-	fmt.Println("Starting the galare server on :3000")
-	// http.ListenAndServe(":3000", csrfMw(umw.SetUser(r))) //with csrf Middleware wrapped in another Middleware
-	http.ListenAndServe(":3000", r) // wrapped middleware applied above
+	// fmt.Println("Starting the galare server on :3000")
+	fmt.Printf("Starting the galare server on %s...\n", cfg.Server.Address)
+	http.ListenAndServe(cfg.Server.Address, r)
+	if err != nil {
+		panic(err)
+	}
 }
