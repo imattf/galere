@@ -177,7 +177,7 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 		Password string
 	}
 	data.Token = r.FormValue("token")
-	data.Token = r.FormValue("password")
+	data.Password = r.FormValue("password")
 
 	user, err := u.PasswordResetService.Consume(data.Token)
 	if err != nil {
