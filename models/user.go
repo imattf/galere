@@ -2,10 +2,19 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	// A coomon pattern is to add the package as a prefix
+	// to the error for context
+	ErrEmailTaken = errors.New("models: email address is already is use")
 )
 
 type User struct {
@@ -37,6 +46,19 @@ func (us *UserService) Create(email, password string) (*User, error) {
 		VALUES ($1, $2) RETURNING id`, email, passwordHash)
 	err = row.Scan(&user.ID)
 	if err != nil {
+		// fmt.Printf("Type = %t\n", err)
+		// fmt.Printf("Error = %v\n", err)
+
+		var pgError *pgconn.PgError
+		if errors.As(err, &pgError) {
+			// This is a PgError, so see if it matches
+			// a unique key violation
+			if pgError.Code == pgerrcode.UniqueViolation {
+				// If this is true, it has to be an email violation
+				// since this is the only type of SQL violation we have
+				return nil, ErrEmailTaken
+			}
+		}
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 	return &user, nil
