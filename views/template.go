@@ -32,11 +32,12 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 				return nil, fmt.Errorf("currentUser not implemented")
 			},
 			"errors": func() []string {
-				return []string{
-					"Don't do that!",
-					"The email address you provided is already associated with an account.",
-					"Something went wrong.",
-				}
+				// return []string{
+				// 	"Don't do that!",
+				// 	"The email address you provided is already associated with an account.",
+				// 	"Something went wrong.",
+				// }
+				return nil
 			},
 		},
 	)
@@ -49,23 +50,12 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	}, nil
 }
 
-// func Parse(filepath string) (Template, error) {
-// 	// parse the gohtml file
-// 	tmpl, err := template.ParseFiles(filepath)
-// 	if err != nil {
-// 		return Template{}, fmt.Errorf("parsing template: %w", err)
-// 	}
-// 	return Template{
-// 		htmlTmpl: tmpl,
-// 	}, nil
-// }
-
 type Template struct {
 	htmlTmpl *template.Template
 }
 
 // helper function...
-func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}) {
+func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface{}, errs ...error) {
 	tmpl, err := t.htmlTmpl.Clone()
 	if err != nil {
 		log.Printf("cloning template: %v", err)
@@ -80,6 +70,14 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 			},
 			"currentUser": func() *models.User {
 				return context.User(r.Context())
+			},
+			"errors": func() []string {
+				var errorMessages []string
+				for _, err := range errs {
+					// TODO: Don't keep long term
+					errorMessages = append(errorMessages, err.Error())
+				}
+				return errorMessages
 			},
 		},
 	)
