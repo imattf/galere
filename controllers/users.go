@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/imattf/galere/context"
+	"github.com/imattf/galere/errors"
 	"github.com/imattf/galere/models"
 )
 
@@ -44,6 +45,9 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// fmt.Println(err)
 		// http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		if errors.Is(err, models.ErrEmailTaken) {
+			err = errors.Public(err, "That email address is already associated with an account.")
+		}
 		u.Templates.New.Execute(w, r, data, err)
 		return
 	}
