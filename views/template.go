@@ -2,6 +2,7 @@ package views
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -13,6 +14,10 @@ import (
 	"github.com/imattf/galere/context"
 	"github.com/imattf/galere/models"
 )
+
+type public interface {
+	Public() string
+}
 
 func Must(t Template, err error) Template {
 	if err != nil {
@@ -62,6 +67,8 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		http.Error(w, "There was an error rendering the page", http.StatusInternalServerError)
 		return
 	}
+	// Call the errMessages func before the closures.
+	errMsgs := errMessages(errs...)
 
 	tmpl = tmpl.Funcs(
 		template.FuncMap{
@@ -72,12 +79,8 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 				return context.User(r.Context())
 			},
 			"errors": func() []string {
-				var errorMessages []string
-				for _, err := range errs {
-					// TODO: Don't keep long term
-					errorMessages = append(errorMessages, err.Error())
-				}
-				return errorMessages
+				// return the pre-processed err messages inside the closure.
+				return errMsgs
 			},
 		},
 	)
@@ -93,4 +96,18 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 		return
 	}
 	io.Copy(w, &buf)
+}
+
+func errMessages(errs ...error) []string {
+	var errMessages []string
+	for _, err := range errs {
+		var pubErr public
+		if errors.As(err, &pubErr) {
+			errMessages = append(errMessages, pubErr.Public())
+		} else {
+			fmt.Println(err)
+			errMessages = append(errMessages, "Something went wrong.")
+		}
+	}
+	return errMessages
 }
