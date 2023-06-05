@@ -11,11 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var (
-	// A coomon pattern is to add the package as a prefix
-	// to the error for context
-	ErrEmailTaken = errors.New("models: email address is already is use")
-)
+// var (
+// 	// A common pattern is to add the package as a prefix
+// 	// to the error for context
+// 	ErrEmailTaken = errors.New("models: email address is already is use")
+// )
 
 type User struct {
 	ID           int
