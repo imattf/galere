@@ -104,6 +104,9 @@ func main() {
 		DB: db,
 	}
 	emailService := models.NewEmailService(cfg.SMTP)
+	galleryService := &models.GalleryService{
+		DB: db,
+	}
 
 	// Setup Middleware...
 	umw := controllers.UserMiddleware{
@@ -142,6 +145,13 @@ func main() {
 		templates.FS,
 		"reset-pw.gohtml", "tailwind.gohtml",
 	))
+	galleriesC := controllers.Galleries{
+		GalleryService: galleryService,
+	}
+	galleriesC.Templates.New = views.Must(views.ParseFS(
+		templates.FS,
+		"galleries/new.gohtml", "tailwind.gohtml",
+	))
 
 	// Setup Router and the Routes...
 	r := chi.NewRouter()
@@ -175,6 +185,7 @@ func main() {
 		// })
 	})
 	r.Get("/user/{userID}", userHandler)
+	r.Get("/galleries/new", galleriesC.New)
 	r.NotFound(notfoundHandler)
 
 	// Start the Server...
