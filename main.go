@@ -116,6 +116,7 @@ func main() {
 	csrfMw := csrf.Protect(
 		[]byte(cfg.CSRF.Key),
 		csrf.Secure(cfg.CSRF.Secure),
+		csrf.Path("/"),
 	)
 
 	// Setup Controllers...
@@ -176,16 +177,18 @@ func main() {
 	r.Post("/forgot-pw", usersC.ProcessForgotPassword)
 	r.Get("/reset-pw", usersC.ResetPassword)
 	r.Post("/reset-pw", usersC.ProcessResetPassword)
-	// r.Get("/users/me", usersC.CurrentUser)
 	r.Route("/users/me", func(r chi.Router) {
 		r.Use(umw.RequireUser)
 		r.Get("/", usersC.CurrentUser)
-		// r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
-		// 	fmt.Fprint(w, "Hello")
-		// })
 	})
-	r.Get("/user/{userID}", userHandler)
-	r.Get("/galleries/new", galleriesC.New)
+	// r.Get("/user/{userID}", userHandler)
+	r.Route("/galleries", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(umw.RequireUser)
+			r.Get("/new", galleriesC.New)
+		})
+	})
+
 	r.NotFound(notfoundHandler)
 
 	// Start the Server...
