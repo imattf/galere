@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -13,6 +14,7 @@ import (
 
 type Galleries struct {
 	Templates struct {
+		Show  Template
 		New   Template
 		Edit  Template
 		Index Template
@@ -150,4 +152,40 @@ func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	// TODO: Lookup the galleries we are going to render
 	g.Templates.Index.Execute(w, r, data)
+}
+
+func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
+	//Get the ID of the gallery we are editing
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		// 404 error - page isn't found
+		http.Error(w, "Invalid ID", http.StatusNotFound)
+		return
+	}
+	//Query for the gallery
+	gallery, err := g.GalleryService.ByID(id)
+	if err != nil {
+		// if err == models.ErrNotFound {
+		if errors.Is(err, models.ErrNotFound) {
+			http.Error(w, "Gallery not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	var data struct {
+		ID     int
+		Title  string
+		Images []string
+	}
+	data.ID = gallery.ID
+	data.Title = gallery.Title
+
+	// Load some temporary images
+	for i := 0; i < 20; i++ {
+		w, h := rand.Intn(500)+200, rand.Intn(500)+200
+		catImageURL := fmt.Sprintf("https://placekitten.com/%d/%d", w, h)
+		data.Images = append(data.Images, catImageURL)
+	}
+	g.Templates.Show.Execute(w, r, data)
 }
