@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/imattf/galere/context"
 	"github.com/imattf/galere/errors"
 	"github.com/imattf/galere/models"
@@ -70,14 +70,19 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
 		return
 	}
-
 	//Render and Edit the gallery
-	data := struct {
+	// data := struct {
+	// 	ID    int
+	// 	Title string
+	// }{
+	// 	ID:    gallery.ID,
+	// 	Title: gallery.Title,
+	// }
+	var data struct {
 		ID    int
 		Title string
-	}{
-		ID:    gallery.ID,
-		Title: gallery.Title,
 	}
+	data.ID = gallery.ID
+	data.Title = gallery.Title
 	g.Templates.Edit.Execute(w, r, data)
 }

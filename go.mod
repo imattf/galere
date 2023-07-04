@@ -3,7 +3,7 @@ module github.com/imattf/galere
 go 1.17
 
 require (
-	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-mail/mail/v2 v2.3.0
 	github.com/gorilla/csrf v1.7.1
 	github.com/jackc/pgconn v1.14.0
