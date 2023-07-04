@@ -53,7 +53,7 @@ func (service *GalleryService) ByUserID(userID int) ([]Gallery, error) {
 	rows, err := service.DB.Query(`
 	  SELECT id, title
 	  FROM galleries
-	  WHERE userID = $1;`, userID)
+	  WHERE user_id = $1;`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("query galleries by user: %w", err)
 	}
