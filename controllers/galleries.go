@@ -68,7 +68,7 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	gallery, err := g.galleryByID(w, r)
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
 	}
@@ -80,10 +80,10 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	err = userMustOwnGallery(w, r, gallery)
-	if err != nil {
-		return
-	}
+	// err = userMustOwnGallery(w, r, gallery)
+	// if err != nil {
+	// 	return
+	// }
 
 	//Render and Edit the gallery
 	// data := struct {
@@ -122,7 +122,7 @@ func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	gallery, err := g.galleryByID(w, r)
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
 	}
@@ -133,10 +133,10 @@ func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
 	// 	return
 	// }
-	err = userMustOwnGallery(w, r, gallery)
-	if err != nil {
-		return
-	}
+	// err = userMustOwnGallery(w, r, gallery)
+	// if err != nil {
+	// 	return
+	// }
 
 	//Parse the title from the form and update the gallery
 	title := r.FormValue("title")
@@ -215,6 +215,21 @@ func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
 		data.Images = append(data.Images, catImageURL)
 	}
 	g.Templates.Show.Execute(w, r, data)
+}
+
+func (g Galleries) Delete(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
+	if err != nil {
+		return
+	}
+
+	//Delete the gallery
+	err = g.GalleryService.Delete(gallery.ID)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/galleries", http.StatusFound)
 }
 
 func (g Galleries) galleryByID(w http.ResponseWriter, r *http.Request, opts ...galleryOpt) (*models.Gallery, error) {
