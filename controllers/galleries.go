@@ -74,11 +74,17 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Verify user owns the gallery
-	user := context.User((r.Context()))
-	if gallery.UserID != user.ID {
-		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+	// user := context.User((r.Context()))
+	// if gallery.UserID != user.ID {
+	// 	http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+	// 	return
+	// }
+
+	err = userMustOwnGallery(w, r, gallery)
+	if err != nil {
 		return
 	}
+
 	//Render and Edit the gallery
 	// data := struct {
 	// 	ID    int
@@ -122,9 +128,13 @@ func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Verify user owns the gallery
-	user := context.User((r.Context()))
-	if gallery.UserID != user.ID {
-		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+	// user := context.User((r.Context()))
+	// if gallery.UserID != user.ID {
+	// 	http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+	// 	return
+	// }
+	err = userMustOwnGallery(w, r, gallery)
+	if err != nil {
 		return
 	}
 
@@ -207,7 +217,7 @@ func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
 	g.Templates.Show.Execute(w, r, data)
 }
 
-func (g Galleries) galleryByID(w http.ResponseWriter, r *http.Request) (*models.Gallery, error) {
+func (g Galleries) galleryByID(w http.ResponseWriter, r *http.Request, opts ...galleryOpt) (*models.Gallery, error) {
 	//Get the ID of the gallery we are editing
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -226,5 +236,29 @@ func (g Galleries) galleryByID(w http.ResponseWriter, r *http.Request) (*models.
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return nil, err
 	}
+
+	// Add a for loop to iterate over all of our functional
+	// options, calling each and returning if there is an error.
+	for _, opt := range opts {
+		err = opt(w, r, gallery)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return gallery, nil
+}
+
+// a function that takes in response writer, request, and gallery and
+// will return an error if something isn't okay.
+type galleryOpt func(w http.ResponseWriter, r *http.Request, gallery *models.Gallery) error
+
+func userMustOwnGallery(w http.ResponseWriter, r *http.Request, gallery *models.Gallery) error {
+	//Verify user owns the gallery
+	user := context.User(r.Context())
+	if user.ID != gallery.UserID {
+		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+		return fmt.Errorf("user does not have access to this gallery")
+	}
+	return nil
 }
