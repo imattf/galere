@@ -19,7 +19,7 @@
 
 # my binary files
 galere
-images/**
+images/
 *.pdf
 
 # Anything under a tmp folder
