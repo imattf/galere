@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -49,50 +48,12 @@ func (g Galleries) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
-	//Get the ID of the gallery we are editing
-	// id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	// if err != nil {
-	// 	// 404 error - page isn't found
-	// 	http.Error(w, "Invalid ID", http.StatusNotFound)
-	// 	return
-	// }
-	// //Query for the gallery
-	// gallery, err := g.GalleryService.ByID(id)
-	// if err != nil {
-	// 	// if err == models.ErrNotFound {
-	// 	if errors.Is(err, models.ErrNotFound) {
-	// 		http.Error(w, "Gallery not found", http.StatusNotFound)
-	// 		return
-	// 	}
-	// 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
-	// 	return
-	// }
 
 	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
 	}
 
-	//Verify user owns the gallery
-	// user := context.User((r.Context()))
-	// if gallery.UserID != user.ID {
-	// 	http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
-	// 	return
-	// }
-
-	// err = userMustOwnGallery(w, r, gallery)
-	// if err != nil {
-	// 	return
-	// }
-
-	//Render and Edit the gallery
-	// data := struct {
-	// 	ID    int
-	// 	Title string
-	// }{
-	// 	ID:    gallery.ID,
-	// 	Title: gallery.Title,
-	// }
 	var data struct {
 		ID    int
 		Title string
@@ -103,40 +64,11 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
-	//Get the ID of the gallery we are editing
-	// id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	// if err != nil {
-	// 	// 404 error - page isn't found
-	// 	http.Error(w, "Invalid ID", http.StatusNotFound)
-	// 	return
-	// }
-	// //Query for the gallery
-	// gallery, err := g.GalleryService.ByID(id)
-	// if err != nil {
-	// 	// if err == models.ErrNotFound {
-	// 	if errors.Is(err, models.ErrNotFound) {
-	// 		http.Error(w, "Gallery not found", http.StatusNotFound)
-	// 		return
-	// 	}
-	// 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
-	// 	return
-	// }
 
 	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
 	}
-
-	//Verify user owns the gallery
-	// user := context.User((r.Context()))
-	// if gallery.UserID != user.ID {
-	// 	http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
-	// 	return
-	// }
-	// err = userMustOwnGallery(w, r, gallery)
-	// if err != nil {
-	// 	return
-	// }
 
 	//Parse the title from the form and update the gallery
 	title := r.FormValue("title")
@@ -177,42 +109,40 @@ func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
-	//Get the ID of the gallery we are editing
-	// id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	// if err != nil {
-	// 	// 404 error - page isn't found
-	// 	http.Error(w, "Invalid ID", http.StatusNotFound)
-	// 	return
-	// }
-	// //Query for the gallery
-	// gallery, err := g.GalleryService.ByID(id)
-	// if err != nil {
-	// 	// if err == models.ErrNotFound {
-	// 	if errors.Is(err, models.ErrNotFound) {
-	// 		http.Error(w, "Gallery not found", http.StatusNotFound)
-	// 		return
-	// 	}
-	// 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
-	// 	return
-	// }
 	gallery, err := g.galleryByID(w, r)
 	if err != nil {
 		return
 	}
 
+	type Image struct {
+		GalleryID int
+		Filename  string
+	}
+
 	var data struct {
 		ID     int
 		Title  string
-		Images []string
+		Images []Image
 	}
 	data.ID = gallery.ID
 	data.Title = gallery.Title
-
 	// Load some temporary images
-	for i := 0; i < 20; i++ {
-		w, h := rand.Intn(500)+200, rand.Intn(500)+200
-		catImageURL := fmt.Sprintf("https://placekitten.com/%d/%d", w, h)
-		data.Images = append(data.Images, catImageURL)
+	// for i := 0; i < 20; i++ {
+	// 	w, h := rand.Intn(500)+200, rand.Intn(500)+200
+	// 	catImageURL := fmt.Sprintf("https://placekitten.com/%d/%d", w, h)
+	// 	data.Images = append(data.Images, catImageURL)
+	// }
+	images, err := g.GalleryService.Images(gallery.ID)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	for _, image := range images {
+		data.Images = append(data.Images, Image{
+			GalleryID: image.GalleryID,
+			Filename:  image.Filename,
+		})
 	}
 	g.Templates.Show.Execute(w, r, data)
 }
