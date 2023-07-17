@@ -242,11 +242,15 @@ func (g Galleries) UploadImage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
-		// fmt.Printf("Attempting to upload %v for gallery %d.\n", fileHeader.Filename, gallery.ID)
-		// io.Copy(w, file)
-		// return
+
 		err = g.GalleryService.CreateImage(gallery.ID, fileHeader.Filename, file)
 		if err != nil {
+			var fileErr models.FileError
+			if errors.As(err, &fileErr) {
+				msg := fmt.Sprintf("%v has an invalid content type or extension. Only png, gif, jpeg and jpg files can be uploaded.", fileHeader.Filename)
+				http.Error(w, msg, http.StatusBadRequest)
+				return
+			}
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
