@@ -224,6 +224,10 @@ func main() {
 		})
 	})
 
+	// Serve local static assests
+	assetsHandler := http.FileServer(http.Dir("assets"))
+	r.Get("/assets/*", http.StripPrefix("/assets", assetsHandler).ServeHTTP)
+
 	r.NotFound(notfoundHandler)
 
 	// Start the Server...
