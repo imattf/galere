@@ -28,3 +28,7 @@ images/
 # sensitive files that should not be in repo
 .config
 .env
+
+
+# tailwind stuff...
+node_modules/
