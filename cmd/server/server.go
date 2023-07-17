@@ -93,18 +93,28 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = run(cfg)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// Make main easier to test
+func run(cfg config) error {
 
 	// Setup Database...
 	db, err := models.Open(cfg.PSQL)
 	if err != nil {
-		panic(err)
+		// panic(err)
+		return err
 	}
 	defer db.Close()
 
 	//...migration tool goose
 	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
-		panic(err)
+		// panic(err)
+		return err
 	}
 
 	// Setup Model Services...
@@ -233,8 +243,11 @@ func main() {
 	// Start the Server...
 	// fmt.Println("Starting the galare server on :3000")
 	fmt.Printf("Starting the galare server on %s...\n", cfg.Server.Address)
-	http.ListenAndServe(cfg.Server.Address, r)
-	if err != nil {
-		panic(err)
-	}
+	// http.ListenAndServe(cfg.Server.Address, r)
+	// if err != nil {
+	// 	// panic(err)
+	// 	return err
+
+	// }
+	return http.ListenAndServe(cfg.Server.Address, r)
 }
