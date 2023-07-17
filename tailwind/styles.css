@@ -2,10 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* my web app stuff... */
 .test {
   font-size: 10rem;
-}
-
-.another-test {
-  font-size: 2rem;
 }

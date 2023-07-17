@@ -995,10 +995,12 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-/* my web app stuff... */
-
 .test {
   font-size: 10rem;
+}
+
+.another-boozy-test {
+  font-size: 2rem;
 }
 
 .hover\:bg-blue-200:hover {
