@@ -15,12 +15,12 @@ Stop docker image & remove dropped orphans
 docker compose down
 ```
 
-Rebuild docker image
+Rebuild docker image with specific compose files
 ```bash
-docker compose -f docker-compose.yaml -f docker-compose.production.yaml up --build
+docker compose -f docker-compose.yml -f docker-compose.production.yml up --build
 ```
 
-Start but remove server first
+Remove specific image, server in this instance
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.production.yml rm server
 ``````
@@ -31,4 +31,26 @@ docker-compose, but are still present from old configs.
 ```bash
 docker compose down --remove-orphans
 docker compose up -d
+```
+
+
+List Docker images
+```
+docker image ls
+```
+
+
+List Docker containers
+```
+docker container ls
+```
+
+Remove specific image
+```
+docker image rm -f [image name or IMAGEID]
+```
+
+Docker kill container...
+```
+docker kill [container name]
 ```

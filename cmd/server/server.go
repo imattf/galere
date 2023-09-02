@@ -35,8 +35,8 @@ func loadEnvConfig() (config, error) {
 	if err != nil {
 		return cfg, err
 	}
-	// Read the PSQL values from ENV variable
 	// cfg.PSQL = models.DefaultPostgresConfig()
+	// Read the PSQL values from ENV variable
 	cfg.PSQL = models.PostgresConfig{
 		Host:     os.Getenv("PSQL_HOST"),
 		Port:     os.Getenv("PSQL_PORT"),
