@@ -54,3 +54,14 @@ Docker kill container...
 ```
 docker kill [container name]
 ```
+
+
+------
+
+In Prod ubuntu, in order to stop container, had to first (was getting permission denied)
+```
+sudo aa-remove-unknown
+sudo systemctl restart docker.service
+
+```
+source: https://superuser.com/questions/1447183/docker-container-not-stopping
