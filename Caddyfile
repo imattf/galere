@@ -1,4 +1,7 @@
 # TODO: Replace this with a domain name before deploying.
-:80
+# :80
+
+# Prod
+galere.faulkners.io
 
 reverse_proxy server:3000

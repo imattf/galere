@@ -52,3 +52,8 @@ go get github.com/go-mail/mail/v2
 
 set up mailtrap.io for SMTP testing...
 https://mailtrap.io/inboxes/2095686/messages
+
+
+## CSRF Notes... 
+#### Random 32 char string
+https://www.random.org/strings/

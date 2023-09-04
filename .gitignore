@@ -25,6 +25,9 @@ images/
 # Anything under a tmp folder
 **/tmp/*
 
+# Anything under the notes folder
+**/notes/*
+
 # sensitive files that should not be in repo
 .config
 .env
