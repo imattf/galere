@@ -158,7 +158,7 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 		"token": {pwReset.Token},
 	}
 	// TODO: Make the URL configurable
-	resetURL := "https://www.galere.com/reset-pw?" + vals.Encode()
+	resetURL := "https://galere.faulkners.io/reset-pw?" + vals.Encode()
 	err = u.EmailService.ForgotPassword(data.Email, resetURL)
 	if err != nil {
 		fmt.Println(err)
