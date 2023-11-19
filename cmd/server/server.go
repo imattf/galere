@@ -14,6 +14,7 @@ import (
 	"github.com/imattf/galere/templates"
 	"github.com/imattf/galere/views"
 	"github.com/joho/godotenv"
+	"golang.org/x/oauth2"
 )
 
 type config struct {
@@ -26,6 +27,7 @@ type config struct {
 	Server struct {
 		Address string
 	}
+	OAuthProviders map[string]*oauth2.Config
 }
 
 func loadEnvConfig() (config, error) {
@@ -68,6 +70,19 @@ func loadEnvConfig() (config, error) {
 	// Read the server values from an ENV variable
 	// cfg.Server.Address = ":3000"
 	cfg.Server.Address = os.Getenv("SERVER_ADDRESS")
+
+	//OAuth Providers
+	cfg.OAuthProviders = make(map[string]*oauth2.Config)
+	dbxConfix := &oauth2.Config{
+		ClientID:     os.Getenv("DROPBOX_APP_ID"),
+		ClientSecret: os.Getenv("DROPBOX_APP_SeCret"),
+		Scopes:       []string{"files.metadata.read", "files.content.read"},
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://www.dropbox.com/oauth2/authorize",
+			TokenURL: "https://api.dropboxapi.com/oauth2/token",
+		},
+	}
+	cfg.OAuthProviders["dropbox"] = dbxConfix
 
 	return cfg, nil
 }
@@ -189,6 +204,9 @@ func run(cfg config) error {
 		templates.FS,
 		"galleries/show.gohtml", "tailwind.gohtml",
 	))
+	oauthC := controllers.OAuth{
+		ProviderConfigs: cfg.OAuthProviders,
+	}
 
 	// Setup Router and the Routes...
 	r := chi.NewRouter()
@@ -232,6 +250,10 @@ func run(cfg config) error {
 			r.Post("/{id}/images", galleriesC.UploadImage)
 			r.Post("/{id}/images/{filename}/delete", galleriesC.DeleteImage)
 		})
+	})
+	r.Route("/oauth/{provider}", func(r chi.Router) {
+		r.Use(umw.RequireUser)
+		r.Get("/connect", oauthC.Connect)
 	})
 
 	// Serve local static assests

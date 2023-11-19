@@ -16,7 +16,7 @@ type OAuth struct {
 
 // Get /oauth/{provider}/connect
 func (oa OAuth) Connect(w http.ResponseWriter, r *http.Request) {
-	provider := chi.URLParam(r, "provder")
+	provider := chi.URLParam(r, "provider")
 	provider = strings.ToLower(provider)
 	config, ok := oa.ProviderConfigs[provider]
 	if !ok {
