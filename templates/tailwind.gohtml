@@ -81,6 +81,37 @@
   }
 </script>
 
+
+<!-- Dropbox Choose stuff...-->
+<script>
+  function closeAlert(event) {
+    let closeable = event.target.closest(".closeable");
+    closeable.remove();
+    // closeable.classList.add("hidden");
+  }
+</script>
+<script
+  type="text/javascript"
+  src="https://www.dropbox.com/static/api/2/dropins.js"
+  id="dropboxjs"
+  data-app-key="je797ro2r55j1d8">
+</script>
+<script>
+  // Options comes from the docs
+  let options = {
+    success: function(files) {
+      alert("Here's the file link: " + files[0].link)
+    },
+    linkType: "direct",
+    multiselect: true,
+    extensions: ['images'],
+    folderselect: false,
+  };
+  // I'm using let instead of var. They both allow us to define new variables in JS, but scope them differently.
+  let button = Dropbox.createChooseButton(options);
+  document.body.appendChild(button);
+</script>
+
 <!-- Actual foot stuff...-->
   <footer class="bg-gray-200 text-center lg:text-left">
   <div class="text-gray-700 text-center p-4" style="background-color: rgba(0, 0, 0, 0.2);">
@@ -88,6 +119,7 @@
     <a class="text-gray-800" href="https://tailwind-elements.com/">faulkners.io</a>
   </div>
   </footer>
+
 </body>
 </html>
 {{end}}
