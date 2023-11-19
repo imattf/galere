@@ -75,7 +75,7 @@ func loadEnvConfig() (config, error) {
 	cfg.OAuthProviders = make(map[string]*oauth2.Config)
 	dbxConfix := &oauth2.Config{
 		ClientID:     os.Getenv("DROPBOX_APP_ID"),
-		ClientSecret: os.Getenv("DROPBOX_APP_SeCret"),
+		ClientSecret: os.Getenv("DROPBOX_APP_SECRET"),
 		Scopes:       []string{"files.metadata.read", "files.content.read"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://www.dropbox.com/oauth2/authorize",
@@ -254,6 +254,7 @@ func run(cfg config) error {
 	r.Route("/oauth/{provider}", func(r chi.Router) {
 		r.Use(umw.RequireUser)
 		r.Get("/connect", oauthC.Connect)
+		r.Get("/callback", oauthC.Callback)
 	})
 
 	// Serve local static assests
