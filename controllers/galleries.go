@@ -259,6 +259,26 @@ func (g Galleries) UploadImage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, editPath, http.StatusFound)
 }
 
+func (g Galleries) ImageViaURL(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
+	if err != nil {
+		return
+	}
+	err = r.ParseForm()
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Invalid Request", http.StatusBadRequest)
+		return
+	}
+	files := r.PostForm["files"]
+	for _, file := range files {
+		// TODO: Download files for real
+		fmt.Printf("Downloading %s...\n", file)
+	}
+	editPath := fmt.Sprintf("/galleries/%d/edit", gallery.ID)
+	http.Redirect(w, r, editPath, http.StatusFound)
+}
+
 func (g Galleries) filename(w http.ResponseWriter, r *http.Request) string {
 	filename := chi.URLParam(r, "filename")
 	filename = filepath.Base(filename)

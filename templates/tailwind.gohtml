@@ -107,6 +107,7 @@
         for(let i = 0; i < files.length; i++) {
           let input = document.createElement("input");
           input.type = "hidden";
+          input.name = "files";
           input.value = files[i].link;
           dbxForm.appendChild(input);
         }
