@@ -199,6 +199,10 @@ func (service *GalleryService) CreateImage(galleryID int, filename string, conte
 }
 
 func (service *GalleryService) CreateImageViaURL(galleryID int, url string) error {
+
+	// Log the downloads...
+	fmt.Println("Downloading ", url)
+
 	filename := path.Base(url)
 	resp, err := http.Get(url)
 	if err != nil {
