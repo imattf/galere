@@ -153,16 +153,22 @@ func (service *GalleryService) Image(galleryID int, filename string) (Image, err
 	}, nil
 }
 
-func (service *GalleryService) CreateImage(galleryID int, filename string, contents io.ReadSeeker) error {
+func (service *GalleryService) CreateImage(galleryID int, filename string, contents io.Reader) error {
+	// 1. Capture the bytes read duing the check
+
 	//check our file contents
-	err := checkContentType(contents, service.imageContentTypes())
+	readBytes, err := checkContentType(contents, service.imageContentTypes())
 	if err != nil {
 		return fmt.Errorf("creating image %v: %w", filename, err)
 	}
 	// or
 	// err = checkExtension(filename, services.extensions())
 	// if err != nil {
-	if !hasExtension(filename, service.extensions()) {
+	// if !hasExtension(filename, service.extensions()) {
+	// 	return fmt.Errorf("creating image %v: %w", filename, err)
+	// }
+	err = checkExtension(filename, service.extensions())
+	if err != nil {
 		return fmt.Errorf("creating image %v: %w", filename, err)
 	}
 
@@ -178,7 +184,14 @@ func (service *GalleryService) CreateImage(galleryID int, filename string, conte
 	}
 	defer dst.Close()
 
-	_, err = io.Copy(dst, contents)
+	//2. Merge the read bytes and the leftover bytes into a single io.reader using io.MultiReader
+	completeFile := io.MultiReader(
+		bytes.NewReader(readBytes),
+		contents,
+	)
+
+	// 3. Copy file into the destinatio,
+	_, err = io.Copy(dst, completeFile)
 	if err != nil {
 		return fmt.Errorf("copying contents to image file: %w", err)
 	}
@@ -195,12 +208,13 @@ func (service *GalleryService) CreateImageViaURL(galleryID int, url string) erro
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("downloading image: invalid status code %d", resp.StatusCode)
 	}
-	imageBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("reading image bytes: %w", err)
-	}
-	readSeeker := bytes.NewReader(imageBytes)
-	return service.CreateImage(galleryID, filename, readSeeker)
+	// imageBytes, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return fmt.Errorf("reading image bytes: %w", err)
+	// }
+	// readSeeker := bytes.NewReader(imageBytes)
+	// return service.CreateImage(galleryID, filename, readSeeker)
+	return service.CreateImage(galleryID, filename, resp.Body)
 }
 
 func (service *GalleryService) DeleteImage(galleryID int, filename string) error {
