@@ -108,7 +108,8 @@
           let input = document.createElement("input");
           input.type = "hidden";
           input.name = "files";
-          input.value = files[i].link;
+          input.value = files[i].link; 
+          {{/* input.value = files[i].link + ".gibberish"; //testing with error group */}}
           dbxForm.appendChild(input);
         }
         dbxForm.submit();

@@ -13,6 +13,7 @@ require (
 	github.com/pressly/goose/v3 v3.9.0
 	golang.org/x/crypto v0.15.0
 	golang.org/x/oauth2 v0.14.0
+	golang.org/x/sync v0.5.0
 )
 
 require (
