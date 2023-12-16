@@ -27,9 +27,10 @@ func Must(t Template, err error) Template {
 	return t
 }
 
-func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
+func ParseFS(fs fs.FS, tmplToExecute string, patterns ...string) (Template, error) {
 	// tmpl := template.New(patterns[0])
-	tmpl := template.New(path.Base(patterns[0]))
+	// tmpl := template.New(path.Base(patterns[0]))
+	tmpl := template.New(path.Base(tmplToExecute))
 
 	tmpl = tmpl.Funcs(
 		template.FuncMap{
@@ -49,6 +50,7 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 			},
 		},
 	)
+	patterns = append(patterns, tmplToExecute)
 	tmpl, err := tmpl.ParseFS(fs, patterns...)
 	if err != nil {
 		return Template{}, fmt.Errorf("parsing template: %w", err)

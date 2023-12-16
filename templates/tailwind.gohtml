@@ -16,6 +16,9 @@
   <!-- revert back to local tailwind assets here -->
   <link rel="stylesheet" href="/assets/styles.css" >
 
+  <!-- Set your global page title here -->
+  <title>{{block "page-title" .}}Galere Photos{{end}}</title>
+
 </head>
 <body class="min-h-screen bg-gray-100">
   <header class="bg-gradient-to-r from-blue-800 to-indigo-800 text-white">
@@ -82,57 +85,29 @@
 </script>
 
 
-<!-- Dropbox Choose stuff...-->
-<script>
-  function closeAlert(event) {
-    let closeable = event.target.closest(".closeable");
-    closeable.remove();
-    // closeable.classList.add("hidden");
-  }
-</script>
-<script
-  type="text/javascript"
-  src="https://www.dropbox.com/static/api/2/dropins.js"
-  id="dropboxjs"
-  data-app-key="je797ro2r55j1d8">
-</script>
-<script>
-  function setupDropbox() {
-    let dbxForm = document.getElementById("dropbox-chooser-form");
-    if(dbxForm === null) {
-      return;
-    }
-    let options = {
-      success: function(files) {
-        for(let i = 0; i < files.length; i++) {
-          let input = document.createElement("input");
-          input.type = "hidden";
-          input.name = "files";
-          input.value = files[i].link; 
-          {{/* input.value = files[i].link + ".gibberish"; //testing with error group */}}
-          dbxForm.appendChild(input);
-        }
-        dbxForm.submit();
-        {{/* alert("Here's the file link: " + files[0].link) */}}
-      },
-      linkType: "direct",
-      multiselect: true,
-      extensions: ['images'],
-      folderselect: false,
-    };
-    let button = Dropbox.createChooseButton(options);
-    dbxForm.appendChild(button);
-  }
-  setupDropbox();
-</script>
+<!-- Testing footer stuff -->
+{{/* {{block "custom-footer" .}}<p>No Custom Footer</p>{{end}} */}}
+
 
 <!-- Actual foot stuff...-->
-  <footer class="bg-gray-200 text-center lg:text-left">
+  {{/* <footer class="bg-gray-200 text-center lg:text-left">
   <div class="text-gray-700 text-center p-4" style="background-color: rgba(0, 0, 0, 0.2);">
     © 2023 Copyright: 
     <a class="text-gray-800" href="https://tailwind-elements.com/">faulkners.io</a>
   </div>
-  </footer>
+  </footer> */}}
+
+
+{{block "custom-footer" .}}
+
+<!-- Actual foot stuff...-->
+<footer class="bg-gray-200 text-center lg:text-left">
+  <div class="text-gray-700 text-center p-4" style="background-color: rgba(0, 0, 0, 0.2);">
+    © 2023 Copyright: 
+    <a class="text-gray-800" href="https://tailwind-elements.com/">faulkners.io</a>
+  </div>
+</footer>
+{{end}}
 
 </body>
 </html>
